@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLE to TKBA</title>
+    <meta name="description" content="Bluetooth app to connect to device during development.">
+    <link rel="icon" sizes="192x192" href="../favicon.png">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="p-5">
+
+    <h1>BLE Test</h1>
+
+    <div id="container">
+      <!--.Mode and wave info.-->
+      <div class="row p-3">
+        <div class="col-md3">
+          <div class="dropdown show">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              CCD Mode 1
+            </a>
+            <div id="ccdModeSelector" style="display:none">3</div>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <a class="dropdown-item active" href="#">Mode 1</a>
+              <a class="dropdown-item" href="#">Mode 2</a>
+              <a class="dropdown-item" href="#">Mode 3</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md3 ml-3">
+          <p><b style="color:#ff0000";>CCD1:</b><br>
+            <b>Integration time:</b> <value id="intTime"> ???</value><br>
+             <b>Distance:</b> <value id="laserDistance"> ???</value><br>
+             <b>Laser wave start at:</b> <value id="laserDetectPx"> ???</value><br>
+             <b>Laser wave length:</b> <value id="laserWaveLength"> ???</value><br>
+          </p>
+        </div>
+        <div class="col-md3 ml-3">
+          <p><b style="color:#0000ff";>CCD2:</b><br>
+            <b>Integration time:</b> <value id="intTime2"> ???</value><br>
+             <b>Distance:</b> <value id="laserDistance2"> ???</value><br>
+             <b>Laser wave start at:</b> <value id="laserDetectPx2"> ???</value><br>
+             <b>Laser wave length:</b> <value id="laserWaveLength2"> ???</value><br>
+          </p>
+        </div>
+        <div class="col-md3 ml-3">
+          <p><b style="color:#00ff00";>CCD3:</b><br>
+            <b>Integration time:</b> <value id="intTime3"> ???</value><br>
+             <b>Distance:</b> <value id="laserDistance3"> ???</value><br>
+             <b>Laser wave start at:</b> <value id="laserDetectPx3"> ???</value><br>
+             <b>Laser wave length:</b> <value id="laserWaveLength3"> ???</value><br>
+          </p>
+        </div>
+      </div>
+      <!--.CCD display.-->
+      <div class="row">
+        <div class="col">
+          <div id="chartContainer" style="height:50px">
+            <canvas id="ccdDisplay"></canvas>
+          </div>
+        </div>
+      </div>
+      <!--.CCD wave draw.-->
+      <div class="row mt-3">
+        <div class="col">
+          <div id="chartContainer" style="height:200px">
+            <div id="statusText">Click here to search for device;</div>
+            <canvas id="waves"></canvas>
+           </div>
+         </div>
+       </div>
+      <!--.Acceleration indication.-->
+      <div class="row mt-3">
+        <!-- Acc_X -->
+        <div class="col">
+          <b>AccX(g):</b> <value id="accX" style="width:100px"> -----</value>  
+          <div id="chartContainer" style="height:20px">
+            <canvas id="accXDisplay"></canvas>
+          </div> 
+        </div>
+      </div>
+        <!-- Acc_Y -->
+      <div class="row">
+        <div class="col">
+          <b>AccY(g):</b> <value id="accY" style="width:100px"> -----</value>
+          <div id="chartContainer" style="height:20px">
+            <canvas id="accYDisplay"></canvas>
+          </div>
+        </div>
+      </div>
+        <!-- Acc_Z -->
+      <div class="row">
+        <div class="col">
+          <b>AccZ(g):</b> <value id="accZ" style="width:100px"> -----</value>
+          <div id="chartContainer" style="height:20px">
+            <canvas id="accZDisplay"></canvas>
+          </div>
+        </div>
+       </div>
+       <!--.Log row.-->
+       <div class="row mt-3">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <form>
+                <div class="form-group form-check">
+                  <input type="checkbox" class="form-check-input" id="enLog">
+                  <label class="form-check-label" for="enLog"><h5>Log distance</h5></label>
+                  <div id="logEnabled" style="display:none">0</div>
+                </div>
+              </form>
+            </div>
+            <div class="card-body">
+              <ul id="log" class="list-group">
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="TKBA.js"></script>
+    <script src="app.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script>
+      $(".dropdown-menu a").click(function(){
+         $("#dropdownMenuLink").text("CCD " + $(this).text());
+         $(".dropdown-item").removeClass("active");
+         $(this).addClass("active");
+         $("#ccdModeSelector").text($(this).index()+1);
+      });
+      $("#enLog").click(function(){
+        $("#logEnabled").text(this.checked?"1":"0");
+      });
+    </script>
+  </body>
+</html>
