@@ -1,10 +1,7 @@
 (function() {
   'use strict';
-  const NVReadkey_Buff =  new Uint8Array([0x2e,0x35,0x25,0x64,0x4a,0x04,0x42,0x72,0x8c,0x8d,0xa6,0xec,0xc2,0x81,0xb5,0xb0]); 	// The 16 byte key matched for read enable		
-  const NVWritekey_Buff = new Uint8Array([0x06,0x33,0x77,0xd7,0x5a,0xef,0x4a,0xc0,0xb5,0x0e,0xe8,0xb4,0xc3,0x75,0x9a,0x22]);		// The 16 byte key matched for read & write enable
-  const characteristicRWAccess = 'f0ba0103-c6b5-11e2-8b8b-0800200c9a66';
-  const serviceRWAccess = 'f0ba0100-c6b5-11e2-8b8b-0800200c9a66';
-  const serviceDataRegister = 'f0ba1b00-c6b5-11e2-8b8b-0800200c9a66';
+  const serviceDataRegister = '000000a0-1212-efde-1523-785fef13d123';
+  const characteristicAcc = '000000a1-1212-efde-1523-785fef13d123';
   class TKBA {
     constructor() {
       this.device = null;
@@ -14,9 +11,10 @@
     connect() {
       return navigator.bluetooth.requestDevice({
         filters: [{
-          services : [serviceDataRegister]
+          //services : [serviceDataRegister]
+          name:'iNanny'
         }],
-        optionalServices: [serviceRWAccess]
+        optionalServices: [serviceDataRegister]
       })
       .then(device => {
         this.device = device;
@@ -27,44 +25,24 @@
         console.log('Getting Service');
         return Promise.all([
           server.getPrimaryService(serviceDataRegister).then(service => {
-            console.log('CCD & Acc service ok...');
+            console.log('Acc service ok...');
             return Promise.all([
-              this._cacheCharacteristic(service, 'f0ba1b01-c6b5-11e2-8b8b-0800200c9a66'),
-              this._cacheCharacteristic(service, 'f0ba1b02-c6b5-11e2-8b8b-0800200c9a66'),
-              this._cacheCharacteristic(service, 'f0ba1b03-c6b5-11e2-8b8b-0800200c9a66'),
+              this._cacheCharacteristic(service, characteristicAcc),
             ])
           }),
-           server.getPrimaryService(serviceRWAccess).then(service => {
-            console.log('RW service ok...');
-            return Promise.all([
-              this._cacheCharacteristic(service, characteristicRWAccess),
-            ])
-          })
         ]);
       })
     }
 
     /* Notifications */
-
-    startNotificationsCCD() {
-      console.log('Starting notifications for CCD');
-      return this._startNotifications('f0ba1b01-c6b5-11e2-8b8b-0800200c9a66');
-    }
-    stopNotificationsCCD() {
-      console.log('Starting notifications for CCD');
-      return this._stopNotifications('f0ba1b01-c6b5-11e2-8b8b-0800200c9a66');
-    }
     startNotificationsAccelerometer() {
       console.log('Starting notifications for Accelerometer');
-      return this._startNotifications('f0ba1b02-c6b5-11e2-8b8b-0800200c9a66');
+      return this._startNotifications(characteristicAcc);
     }
     stopNotificationsAccelerometer() {
-      return this._stopNotifications('f0ba1b02-c6b5-11e2-8b8b-0800200c9a66');
+      return this._stopNotifications(characteristicAcc);
     }
-    writeKeyPermission(){
-    	console.log('Write key permission to the sensor');
-    	return this._writeCharacteristicValue(characteristicRWAccess, NVWritekey_Buff);
-    }
+
    
     /* Utils */
 

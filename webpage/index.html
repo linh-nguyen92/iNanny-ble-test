@@ -16,50 +16,13 @@
     <div id="container">
       <!--.Mode and wave info.-->
       <div class="row p-3">
-        <div class="col-md3">
-          <div class="dropdown show">
-            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              CCD Mode 1
-            </a>
-            <div id="ccdModeSelector" style="display:none">3</div>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-              <a class="dropdown-item active" href="#">Mode 1</a>
-              <a class="dropdown-item" href="#">Mode 2</a>
-              <a class="dropdown-item" href="#">Mode 3</a>
-            </div>
-          </div>
-        </div>
         <div class="col-md3 ml-3">
-          <p><b style="color:#ff0000";>CCD1:</b><br>
-            <b>Integration time:</b> <value id="intTime"> ???</value><br>
-             <b>Distance:</b> <value id="laserDistance"> ???</value><br>
-             <b>Laser wave start at:</b> <value id="laserDetectPx"> ???</value><br>
-             <b>Laser wave length:</b> <value id="laserWaveLength"> ???</value><br>
+          <p><b style="color:#ff0000";>Info:</b><br>
+            <b>Blabla:</b> <value id="intTime"> ???</value><br>
+             <b>Blabla:</b> <value id="laserDistance"> ???</value><br>
+             <b>Blabla:</b> <value id="laserDetectPx"> ???</value><br>
+             <b>Blabla:</b> <value id="laserWaveLength"> ???</value><br>
           </p>
-        </div>
-        <div class="col-md3 ml-3">
-          <p><b style="color:#0000ff";>CCD2:</b><br>
-            <b>Integration time:</b> <value id="intTime2"> ???</value><br>
-             <b>Distance:</b> <value id="laserDistance2"> ???</value><br>
-             <b>Laser wave start at:</b> <value id="laserDetectPx2"> ???</value><br>
-             <b>Laser wave length:</b> <value id="laserWaveLength2"> ???</value><br>
-          </p>
-        </div>
-        <div class="col-md3 ml-3">
-          <p><b style="color:#00ff00";>CCD3:</b><br>
-            <b>Integration time:</b> <value id="intTime3"> ???</value><br>
-             <b>Distance:</b> <value id="laserDistance3"> ???</value><br>
-             <b>Laser wave start at:</b> <value id="laserDetectPx3"> ???</value><br>
-             <b>Laser wave length:</b> <value id="laserWaveLength3"> ???</value><br>
-          </p>
-        </div>
-      </div>
-      <!--.CCD display.-->
-      <div class="row">
-        <div class="col">
-          <div id="chartContainer" style="height:50px">
-            <canvas id="ccdDisplay"></canvas>
-          </div>
         </div>
       </div>
       <!--.CCD wave draw.-->
@@ -107,7 +70,7 @@
               <form>
                 <div class="form-group form-check">
                   <input type="checkbox" class="form-check-input" id="enLog">
-                  <label class="form-check-label" for="enLog"><h5>Log distance</h5></label>
+                  <label class="form-check-label" for="enLog"><h5>Log</h5></label>
                   <div id="logEnabled" style="display:none">0</div>
                 </div>
               </form>
@@ -120,7 +83,7 @@
         </div>
       </div>
     </div>
-    <script src="TKBA.js"></script>
+    <script src="nRF52.js"></script>
     <script src="app.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
