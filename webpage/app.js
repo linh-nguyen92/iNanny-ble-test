@@ -1,4 +1,5 @@
 var canvas = document.querySelector('#waves');
+var canvas_int = document.querySelector('#waves_int');
 var accXCanvas = document.querySelector('#accXDisplay');
 var accYCanvas = document.querySelector('#accYDisplay');
 var accZCanvas = document.querySelector('#accZDisplay');
@@ -19,6 +20,8 @@ const graph_num_data_point = 60;
 var accelerometerX = Array(graph_num_data_point).fill(0);
 var accelerometerY = Array(graph_num_data_point).fill(0);
 var accelerometerZ = Array(graph_num_data_point).fill(0);
+var accelerometer_INT1 = Array(graph_num_data_point).fill(0);
+var accelerometer_INT2 = Array(graph_num_data_point).fill(0);
 var acc_idx = 0;
 //var laserStart, laserLenght, sensitivity;
 //var chartLenght = 256;
@@ -55,6 +58,7 @@ function handleAccelerometer(accData) {
     //statusText.textContent = event.target.value.getUint8(0) + event.target.value.getUint8(1) + event.target.value.getUint8(2) + event.target.value.getUint8(3) + event.target.value.getUint8(1) + event.target.value.getUint8(4) + event.target.value.getUint8(5);
     statusText.textContent = event.target.byteLenght;
     var accX, accY, accZ;
+    var accINT1, accINT2;
     
     var sign = event.target.value.getUint8(1) & (1 << 7);
     var accX = (((event.target.value.getUint8(1) & 0xFF) << 8) | (event.target.value.getUint8(0) & 0xFF));
@@ -70,6 +74,18 @@ function handleAccelerometer(accData) {
     var accZ = (((event.target.value.getUint8(5) & 0xFF) << 8) | (event.target.value.getUint8(4) & 0xFF));
     if (sign) {
        accZ = 0xFFFF0000 | accZ;  // fill in most significant bits with 1's
+    }
+
+    var sign = event.target.value.getUint8(7) & (1 << 7);
+    var accINT1 = (((event.target.value.getUint8(7) & 0xFF) << 8) | (event.target.value.getUint8(6) & 0xFF));
+    if (sign) {
+       accINT1 = 0xFFFF0000 | accINT1;  // fill in most significant bits with 1's
+    }
+    
+    var sign = event.target.value.getUint8(9) & (1 << 7);
+    var accINT2 = (((event.target.value.getUint8(9) & 0xFF) << 8) | (event.target.value.getUint8(8) & 0xFF));
+    if (sign) {
+       accINT2 = 0xFFFF0000 | accINT2;  // fill in most significant bits with 1's
     }
 
     if(acc_idx>=graph_num_data_point){
@@ -88,6 +104,7 @@ function handleAccelerometer(accData) {
       accelerometerX[acc_idx] = accX*ACCEL_DATA_OFFSET_DATA_HANDLING*ACCEL_DATA_SCALE;
       accelerometerY[acc_idx] = accY*ACCEL_DATA_OFFSET_DATA_HANDLING*ACCEL_DATA_SCALE;
       accelerometerZ[acc_idx] = accZ*ACCEL_DATA_OFFSET_DATA_HANDLING*ACCEL_DATA_SCALE;
+      accelerometer_INT1[acc_idx] = accINT1;
       
       drawAcc(accX, accXCanvas);
       drawAcc(accY, accYCanvas);
@@ -96,6 +113,7 @@ function handleAccelerometer(accData) {
       	drawWaves(canvas, _clear =true);
       else
       	drawWaves(canvas);
+      	drawWaves_int(canvas_int);
     	acc_idx++;
   });
 }
@@ -190,6 +208,47 @@ function drawWaves(_canvas, _color = '#900c3f', _clear = false ) {
 	for(var i = 1; i<graph_num_data_point ; i++)
  	{
       context.lineTo(square_side * (i), _canvas.height-(accelerometerZ[i]+offset));
+   }
+	context.stroke();
+	      
+  });
+}
+
+function drawWaves_int(_canvas, _color = '#900c3f', _clear = false ) {
+  requestAnimationFrame(() => {
+    _canvas.width = parseInt(getComputedStyle(canvas).width.slice(0, -2)) * devicePixelRatio;
+    _canvas.height = 50;//parseInt(getComputedStyle(_canvas).height.slice(0, -2)) * devicePixelRatio;
+    
+   var low_edge = 5;
+   var high_edge = _canvas.height - low_edge;
+   var context = _canvas.getContext('2d');
+   var margin = 2;
+   var max = Math.max(0, Math.round(_canvas.width / 11));
+	context.clearRect(0, 0, _canvas.width, _canvas.height);
+	// Zero line
+	    context.beginPath();
+    context.lineWidth = 2;
+    context.lineJoin = 'round';
+    context.shadowBlur = '1';
+    context.strokeStyle = '#000000';
+    context.shadowOffsetY = '1';
+    
+    var square_side = _canvas.width/graph_num_data_point;
+	// INT1
+    
+    context.beginPath();
+    context.lineWidth = 3;
+    context.lineJoin = 'round';
+    context.shadowBlur = '1';
+    context.strokeStyle = '#900c3f';
+    context.shadowOffsetY = '1';
+    
+    var square_side = _canvas.width/graph_num_data_point;
+	// CCD 1
+	context.moveTo(0, high_edge - (high_edge-low_edge)*accelerometer_INT1[0]);
+	for(var i = 1; i<graph_num_data_point ; i++)
+ 	{
+      context.lineTo(square_side * (i), high_edge - (high_edge-low_edge)*accelerometer_INT1[i]);
    }
 	context.stroke();
 	      
