@@ -60,41 +60,39 @@ function handleAccelerometer(accData) {
     var accX, accY, accZ;
     var accINT1, accINT2;
     
-    var sign = event.target.value.getUint8(1) & (1 << 7);
-    var accX = (((event.target.value.getUint8(1) & 0xFF) << 8) | (event.target.value.getUint8(0) & 0xFF));
-    if (sign) {
-       accX = 0xFFFF0000 | accX;  // fill in most significant bits with 1's
-    }
-    var sign = event.target.value.getUint8(3) & (1 << 7);
-    var accY = (((event.target.value.getUint8(3) & 0xFF) << 8) | (event.target.value.getUint8(2) & 0xFF));
-    if (sign) {
-       accY = 0xFFFF0000 | accY;  // fill in most significant bits with 1's
-    }
-    var sign = event.target.value.getUint8(5) & (1 << 7);
-    var accZ = (((event.target.value.getUint8(5) & 0xFF) << 8) | (event.target.value.getUint8(4) & 0xFF));
-    if (sign) {
-       accZ = 0xFFFF0000 | accZ;  // fill in most significant bits with 1's
-    }
-
-    var sign = event.target.value.getUint8(7) & (1 << 7);
-    var accINT1 = (((event.target.value.getUint8(7) & 0xFF) << 8) | (event.target.value.getUint8(6) & 0xFF));
-    if (sign) {
-       accINT1 = 0xFFFF0000 | accINT1;  // fill in most significant bits with 1's
-    }
-    
-    var sign = event.target.value.getUint8(9) & (1 << 7);
-    var accINT2 = (((event.target.value.getUint8(9) & 0xFF) << 8) | (event.target.value.getUint8(8) & 0xFF));
-    if (sign) {
-       accINT2 = 0xFFFF0000 | accINT2;  // fill in most significant bits with 1's
-    }
-
+     var data = [
+                  event.target.value.getUint8(11),
+                  event.target.value.getUint8(10),
+                  event.target.value.getUint8(9),
+                  event.target.value.getUint8(8),
+      				event.target.value.getUint8(7),
+                  event.target.value.getUint8(6),
+                  event.target.value.getUint8(5),
+                  event.target.value.getUint8(4),
+      				event.target.value.getUint8(3),
+                  event.target.value.getUint8(2),
+                  event.target.value.getUint8(1),
+                  event.target.value.getUint8(0)];
+                  
+      var buf = new ArrayBuffer(12);
+      var view = new DataView(buf);
+      data.forEach(function (b, i) {
+          view.setUint8(i, b);
+      });
+      accX= view.getFloat32(0);
+      accY= view.getFloat32(4);
+      accZ= view.getFloat32(8);
+      accINT1 = event.target.value.getUint8(12);
+      accINT2 = event.target.value.getUint8(13);
+      
+      
     if(acc_idx>=graph_num_data_point){
       acc_idx=0;
     }
       // Convert to g-scale
-     accX = Number((accX/(1000*ACCEL_DATA_OFFSET_DATA_HANDLING)).toFixed(2)); // divided by 2^15 and multiply by acc scale (2g) then round up to 3 digit
-     accY = Number((accY/(1000*ACCEL_DATA_OFFSET_DATA_HANDLING)).toFixed(2)); // divided by 2^15 and multiply by acc scale (2g) then round up to 3 digit
-     accZ = Number((accZ/(1000*ACCEL_DATA_OFFSET_DATA_HANDLING)).toFixed(2)); // divided by 2^15 and multiply by acc scale (2g) then round up to 3 digit
+     accX = Number(accX/1000).toFixed(2); // divided by 2^15 and multiply by acc scale (2g) then round up to 3 digit
+     accY = Number(accY/1000).toFixed(2); // divided by 2^15 and multiply by acc scale (2g) then round up to 3 digit
+     accZ = Number(accZ/1000).toFixed(2); // divided by 2^15 and multiply by acc scale (2g) then round up to 3 digit
      
       
       /* Show the acc */
