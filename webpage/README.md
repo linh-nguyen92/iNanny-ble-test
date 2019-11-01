@@ -1,4 +1,4 @@
 # BLE test sensor
 
-Available at https://gabrieldespindula.github.io/ble-test/webpage/
+Available at https://linh-nguyen92.github.io/iNanny-ble-test/webpage/
 
