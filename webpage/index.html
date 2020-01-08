@@ -14,80 +14,87 @@
     <h1>BLE Test</h1>
 
     <div id="container">
-      <!--.Mode and wave info.-->
+      <!--Packet format setting-->
+      <div class="row p-1">
+        <b style="color:#ff0000";>Packet: </b>       
+        <div class="col p-1">
+          <input type="checkbox" id="cb_temp" value="1" checked > Temperature
+          <input type="checkbox" id="cb_cap" value="2" checked> Capacitor
+          <input type="checkbox" id="cb_acc_data" value="2" checked> Motion data 
+          <input type="checkbox" id="cb_acc_int" value="2" checked> Motion interrupt
+        </div>
+      </div>
       <div class="row p-3">
-        <div class="col-md3 ml-3">
-          <p><b style="color:#ff0000";>Info:</b><br>
-            <b>Blabla:</b> <value id="intTime"> ???</value><br>
-             <b>Blabla:</b> <value id="laserDistance"> ???</value><br>
-             <b>Blabla:</b> <value id="laserDetectPx"> ???</value><br>
-             <b>Blabla:</b> <value id="laserWaveLength"> ???</value><br>
-          </p>
-        </div>
-      </div>
-      <!--.CCD wave draw.-->
-      <div class="row mt-3">
-        <div class="col">
-          <div id="chartContainer" style="height:50px">
-            <canvas id="waves_int"></canvas>
-           </div>
-         </div>
-       </div>
-      <!--.CCD wave draw.-->
-      <div class="row mt-3">
-        <div class="col">
-          <div id="chartContainer" style="height:200px">
-            <div id="statusText">Click here to search for device;</div>
-            <canvas id="waves"></canvas>
-           </div>
-         </div>
-       </div>
-      <!--.Acceleration indication.-->
-      <div class="row mt-3">
-        <!-- Acc_X -->
-        <div class="col">
-          <b>AccX(g):</b> <value id="accX" style="width:100px"> -----</value>  
-          <div id="chartContainer" style="height:20px">
-            <canvas id="accXDisplay"></canvas>
-          </div> 
-        </div>
-      </div>
-        <!-- Acc_Y -->
-      <div class="row">
-        <div class="col">
-          <b>AccY(g):</b> <value id="accY" style="width:100px"> -----</value>
-          <div id="chartContainer" style="height:20px">
-            <canvas id="accYDisplay"></canvas>
+        <!--Logging-->       
+        <div class="column pl-2">
+          <!--Log setup-->
+          <div class="row pl-3">
+            <b style="color:#ff0000";>Log: </b>       
+            <div class="col p-1">
+              <input type="checkbox" id="cb_log_cap" value="2" checked> Capacitor
+              <input type="checkbox" id="cb_log_temp" value="1" checked > Temperature
+              <input type="checkbox" id="cb_log_acc" value="2" checked> Motion data 
+              <input type="checkbox" id="cb_log_int" value="2" checked> Motion interrupt             
+            </div>
           </div>
-        </div>
-      </div>
-        <!-- Acc_Z -->
-      <div class="row">
-        <div class="col">
-          <b>AccZ(g):</b> <value id="accZ" style="width:100px"> -----</value>
-          <div id="chartContainer" style="height:20px">
-            <canvas id="accZDisplay"></canvas>
+          <!--Log save and start-->
+          <div class="row pl-3">
+            <div class="col p-1">
+              <label for="log">File name</label>
+              <input type="text" id="tb_fileName">
+              <button type="button" id="btn_log">Start logging</button>
+            </div>
           </div>
-        </div>
-       </div>
-       <!--.Log row.-->
-       <div class="row mt-3">
-        <div class="col">
-          <div class="card">
-            <div class="card-header">
-              <form>
-                <div class="form-group form-check">
-                  <input type="checkbox" class="form-check-input" id="enLog">
-                  <label class="form-check-label" for="enLog"><h5>Log</h5></label>
-                  <div id="logEnabled" style="display:none">0</div>
+           <!--.Log row.-->
+          <div class="row mt-3">
+             <div class="col">
+               <div class="card">
+                <div class="card-header">
+                  <form>
+                    <div class="form-group form-check">
+                      <label class="form-check-label" for="enLog"><h5>Packet x : [ cap1 | cap2 | cap3 | cap4 ||
+                              temp1 | temp2 | temp3 | temp4  || accX | accY | accZ || INT1 | INT2 ]
+                      </h5></label>
+                    </div>
+                  </form>
                 </div>
-              </form>
-            </div>
-            <div class="card-body">
-              <ul id="log" class="list-group">
-              </ul>
+                <div class="card-body">
+                  <ul id="log" class="list-group">
+                  </ul>
+                </div>
+               </div>
+             </div>
+          </div>
+        </div>
+        <!--Plotting-->    
+        <div class="column">
+          <!--Plot setup-->
+          <div class="row p-1">
+            <b style="color:#ff0000";>Plot: </b>       
+            <div class="col p-1">
+              <input type="checkbox" id="cb_plot_temp" value="1" checked > Temperature
+              <input type="checkbox" id="cb_plot_cap" value="2" checked> Capacitor
+              <input type="checkbox" id="cb_plot_acc" value="2" checked> Motion data 
+              <input type="checkbox" id="cb_plot_int" value="2" checked> Motion interrupt
             </div>
           </div>
+          <!--Data-->
+          <div class="row mt-3">
+          <div class="col">
+            <div id="chartContainer" style="height:200px">
+              <div id="statusText">Click here to search for device;</div>
+              <canvas id="waves"></canvas>
+             </div>
+           </div>
+         </div>
+         <!--Motion interrupt-->
+          <div class="row mt-3">
+            <div class="col">
+              <div id="chartContainer" style="height:50px">
+                <canvas id="waves_int"></canvas>
+               </div>
+             </div>
+           </div>
         </div>
       </div>
     </div>

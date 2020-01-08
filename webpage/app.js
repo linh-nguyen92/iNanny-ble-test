@@ -4,7 +4,9 @@ var accXCanvas = document.querySelector('#accXDisplay');
 var accYCanvas = document.querySelector('#accYDisplay');
 var accZCanvas = document.querySelector('#accZDisplay');
 var statusText = document.querySelector('#statusText');
+var startLog = document.querySelector('#btn_log');
 
+var fileName = document.getElementById("tb_fileName");
 var lbIntTime = document.getElementById("intTime");
 var lbLaserDist = document.getElementById("laserDistance");
 var lbLaserStart = document.getElementById("laserDetectPx");
@@ -15,8 +17,26 @@ var lbAccX = document.getElementById("accX");
 var lbAccY = document.getElementById("accY");
 var lbAccZ = document.getElementById("accZ");
 
+var cbTemp = document.getElementById("cb_log_temp");
+var cbCap = document.getElementById("cb_log_cap");
+var cbAcc = document.getElementById("cb_log_acc");
+var cbInt = document.getElementById("cb_log_int");
+
 var heartRates = [];
 const graph_num_data_point = 60;
+const packet_size = 62;
+var pkg_idx = 0;
+
+var capacitor_1 = Array(graph_num_data_point).fill(0);
+var capacitor_2 = Array(graph_num_data_point).fill(0);
+var capacitor_3 = Array(graph_num_data_point).fill(0);
+var capacitor_4 = Array(graph_num_data_point).fill(0);
+
+var temperature_1 = Array(graph_num_data_point).fill(0);
+var temperature_2 = Array(graph_num_data_point).fill(0);
+var temperature_3 = Array(graph_num_data_point).fill(0);
+var temperature_4 = Array(graph_num_data_point).fill(0);
+
 var accelerometerX = Array(graph_num_data_point).fill(0);
 var accelerometerY = Array(graph_num_data_point).fill(0);
 var accelerometerZ = Array(graph_num_data_point).fill(0);
@@ -31,13 +51,27 @@ var acc_idx = 0;
 var drawCompleteFlag = true; // Flag to indicate if draw is completed (true) or not (false)
 var dataFillFlag = false; // Flag to start fill new comming data into the array. 
 var nLogs = 0;
+var flag_logging = 0;
+var log_header;
+
+
 const HEADER_SIZE = 6;
 const ACCEL_DATA_OFFSET_DATA_HANDLING = 10;
 const ACCEL_DATA_SCALE = 5;
 
+let csvContent = "data:text/csv;charset=utf-8,";
+
 statusText.addEventListener('click', function() {
   statusText.textContent = 'Connecting...';
   heartRates = [];
+  capacitor_1 = [];
+  capacitor_2 = [];
+  capacitor_3 = [];
+  capacitor_4 = [];
+  temperature_1 = [];
+  temperature_2 = [];
+  temperature_3 = [];
+  temperature_4 = [];
   accelerometerX = [];
   accelerometerY = [];
   accelerometerZ = [];
@@ -49,46 +83,90 @@ statusText.addEventListener('click', function() {
   });
 });
 
+startLog.addEventListener('click', function() {
+if (flag_logging)
+{
+	startLog.innerText = 'Start logging';
+	var encodedUri = encodeURI(csvContent);
+   var link = document.createElement("a");
+   link.setAttribute("href", encodedUri);
+   link.setAttribute("download", fileName.value+".csv");
+   document.body.appendChild(link); // Required for FF
+
+   link.click();
+	flag_logging = 0;
+}
+else
+{
+   csvContent = "data:text/csv;charset=utf-8,";
+   csvContent += "Time Stamp;";
+   if(cbCap.checked)
+      csvContent += "Cap 1; Cap 2; Cap 3; Cap 4;";
+   if(cbTemp.checked)
+      csvContent += "Temp 1; Temp 2; Temp 3; Temp 4;";
+   if(cbAcc.checked)
+      csvContent += "Acc X; Acc Y; Acc Z;"
+   if(cbInt.checked)
+      csvContent += "INT 1; INT2;"
+   csvContent +=  "\r\n";
+   startLog.innerText = 'Logging...';
+	flag_logging = 1;
+}
+
+});
+
 function handleAccelerometer(accData) {
   console.log('Accelerometer event settled');
   acc_idx = 0;
+  pkg_idx = 0;
   
   accData.addEventListener('characteristicvaluechanged', event => {
     //console.log('New notification - ' + event.target.value.getUint8(0) + ' ' + event.target.value.getUint8(1) + ' ' + event.target.value.getUint8(2));
     //statusText.textContent = event.target.value.getUint8(0) + event.target.value.getUint8(1) + event.target.value.getUint8(2) + event.target.value.getUint8(3) + event.target.value.getUint8(1) + event.target.value.getUint8(4) + event.target.value.getUint8(5);
     statusText.textContent = event.target.byteLenght;
-    var accX, accY, accZ;
-    var accINT1, accINT2;
+    var cap1, cap2, cap3, cap4;  // double 8 bytes
+    var temp1, temp2, temp3, temp4; // float 4 bytes
+    var accX, accY, accZ; // float 4 bytes
+    var accINT1, accINT2; // uint8 1 byte
+    var i;
     
-     var data = [
-                  event.target.value.getUint8(11),
-                  event.target.value.getUint8(10),
-                  event.target.value.getUint8(9),
-                  event.target.value.getUint8(8),
-      				event.target.value.getUint8(7),
-                  event.target.value.getUint8(6),
-                  event.target.value.getUint8(5),
-                  event.target.value.getUint8(4),
-      				event.target.value.getUint8(3),
-                  event.target.value.getUint8(2),
-                  event.target.value.getUint8(1),
-                  event.target.value.getUint8(0)];
+     var data = Array(packet_size).fill(0);
+     for (i = 0; i < packet_size-2; i++)
+     {
+     	 data[i] = event.target.value.getUint8(packet_size-3-i);
+     }
                   
-      var buf = new ArrayBuffer(12);
+      var buf = new ArrayBuffer(packet_size);
       var view = new DataView(buf);
       data.forEach(function (b, i) {
           view.setUint8(i, b);
       });
-      accX= view.getFloat32(0);
+      cap1 = view.getFloat64(52);
+      cap2 = view.getFloat64(44);
+      cap3 = view.getFloat64(36);
+      cap4 = view.getFloat64(28);
+      temp1 = view.getFloat32(24);
+      temp2 = view.getFloat32(20);
+      temp3 = view.getFloat32(16);
+      temp4 = view.getFloat32(12);
+      accX= view.getFloat32(8);
       accY= view.getFloat32(4);
-      accZ= view.getFloat32(8);
-      accINT1 = event.target.value.getUint8(12);
-      accINT2 = event.target.value.getUint8(13);
+      accZ= view.getFloat32(0);
+      accINT1 = event.target.value.getUint8(60);
+      accINT2 = event.target.value.getUint8(61);
       
       
     if(acc_idx>=graph_num_data_point){
       acc_idx=0;
     }
+      cap1 = Number(cap1).toFixed(2);
+      cap2 = Number(cap2).toFixed(2);
+      cap3 = Number(cap3).toFixed(2);
+      cap4 = Number(cap4).toFixed(2);
+      temp1 = Number(temp1).toFixed(2);
+      temp2 = Number(temp2).toFixed(2);
+      temp3 = Number(temp3).toFixed(2);
+      temp4 = Number(temp4).toFixed(2);
       // Convert to g-scale
      accX = Number(accX/1000).toFixed(2); // divided by 2^15 and multiply by acc scale (2g) then round up to 3 digit
      accY = Number(accY/1000).toFixed(2); // divided by 2^15 and multiply by acc scale (2g) then round up to 3 digit
@@ -96,23 +174,52 @@ function handleAccelerometer(accData) {
      
       
       /* Show the acc */
-      lbAccX.innerHTML = accX.toString();
-      lbAccY.innerHTML = accY.toString();
-      lbAccZ.innerHTML = accZ.toString();
       accelerometerX[acc_idx] = accX*ACCEL_DATA_OFFSET_DATA_HANDLING*ACCEL_DATA_SCALE;
       accelerometerY[acc_idx] = accY*ACCEL_DATA_OFFSET_DATA_HANDLING*ACCEL_DATA_SCALE;
       accelerometerZ[acc_idx] = accZ*ACCEL_DATA_OFFSET_DATA_HANDLING*ACCEL_DATA_SCALE;
       accelerometer_INT1[acc_idx] = accINT1;
       
-      drawAcc(accX, accXCanvas);
-      drawAcc(accY, accYCanvas);
-      drawAcc(accZ, accZCanvas);
+      //drawAcc(accX, accXCanvas);
+      //drawAcc(accY, accYCanvas);
+      //drawAcc(accZ, accZCanvas);
       if (acc_idx == 0)
       	drawWaves(canvas, _clear =true);
       else
       	drawWaves(canvas);
       	drawWaves_int(canvas_int);
+      	
+       $("#log").append('<li class="list-group-item">'+'Packet '+(pkg_idx+1).toString()+
+       ':  [ '+cap1.toString()+' | '+ cap2.toString()+' | '+ cap3.toString()+' | '+ cap4.toString()+' || '+
+         temp1.toString()+' | '+ temp2.toString()+' | '+ temp3.toString()+' | '+ temp4.toString()+
+       ' || '+ accX.toString()+' | '+ accY.toString()+' | '+ accZ.toString()+' || '+
+       accINT1.toString()+' | '+ accINT2.toString()+' ]'+'</li>');
+       $("#log").scrollTop(pkg_idx*100); 
+       $("#log").last().focus();
     	acc_idx++;
+    	pkg_idx++;
+    	
+    	/* Write to CSV file*/
+      if (flag_logging)
+      {
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date+' '+time;
+         
+         var data_array = [dateTime.toString()]
+         if(cbCap.checked)
+		      data_array.push(cap1.toString(), cap2.toString(), cap3.toString(), cap4.toString());
+		   if(cbTemp.checked)
+		      data_array.push(temp1.toString(), temp2.toString(), temp3.toString(), temp4.toString());
+		   if(cbAcc.checked)
+		      data_array.push(accX.toString(), accY.toString(), accZ.toString());
+		   if(cbInt.checked)
+		      data_array.push(accINT1.toString(), accINT2.toString());
+
+         let row = data_array.join(";");
+         csvContent += row + "\r\n";
+      }
+
   });
 }
 
