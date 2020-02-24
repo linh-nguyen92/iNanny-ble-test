@@ -20,8 +20,9 @@
         <div class="col p-1">
           <input type="checkbox" id="cb_temp" value="1" checked > Temperature
           <input type="checkbox" id="cb_cap" value="2" checked> Capacitor
-          <input type="checkbox" id="cb_acc_data" value="2" checked> Motion data 
-          <input type="checkbox" id="cb_acc_int" value="2" checked> Motion interrupt
+          <input type="checkbox" id="cb_acc_data" value="3" checked> Motion data 
+          <input type="checkbox" id="cb_acc_int" value="4" checked> Motion interrupt
+          <input type="checkbox" id="cb_fuel_gauge" value="5" checked> Fuel gauge    
         </div>
       </div>
       <div class="row p-3">
@@ -31,10 +32,11 @@
           <div class="row pl-3">
             <b style="color:#ff0000";>Log: </b>       
             <div class="col p-1">
-              <input type="checkbox" id="cb_log_cap" value="2" checked> Capacitor
-              <input type="checkbox" id="cb_log_temp" value="1" checked > Temperature
-              <input type="checkbox" id="cb_log_acc" value="2" checked> Motion data 
-              <input type="checkbox" id="cb_log_int" value="2" checked> Motion interrupt             
+              <input type="checkbox" id="cb_log_cap" value="1" checked> Capacitor
+              <input type="checkbox" id="cb_log_temp" value="2" checked > Temperature
+              <input type="checkbox" id="cb_log_acc" value="3" checked> Motion data 
+              <input type="checkbox" id="cb_log_int" value="4" checked> Motion interrupt  
+              <input type="checkbox" id="cb_log_fuel_gauge" value="5" checked> Fuel gauge           
             </div>
           </div>
           <!--Log save and start-->
@@ -53,7 +55,7 @@
                   <form>
                     <div class="form-group form-check">
                       <label class="form-check-label" for="enLog"><h5>Packet x : [ cap1 | cap2 | cap3 | cap4 ||
-                              temp1 | temp2 | temp3 | temp4  || accX | accY | accZ || INT1 | INT2 ]
+                              temp1 | temp2 | temp3 | temp4  || accX | accY | accZ || INT1 | INT2 || BAT_V | BAT_% || rssi_dBm]
                       </h5></label>
                     </div>
                   </form>

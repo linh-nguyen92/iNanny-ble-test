@@ -21,10 +21,11 @@ var cbTemp = document.getElementById("cb_log_temp");
 var cbCap = document.getElementById("cb_log_cap");
 var cbAcc = document.getElementById("cb_log_acc");
 var cbInt = document.getElementById("cb_log_int");
+var cbFuelGauge = document.getElementById("cb_log_fuel_gauge");
 
 var heartRates = [];
 const graph_num_data_point = 60;
-const packet_size = 62;
+const packet_size = 67;
 var pkg_idx = 0;
 
 var capacitor_1 = Array(graph_num_data_point).fill(0);
@@ -43,6 +44,9 @@ var accelerometerZ = Array(graph_num_data_point).fill(0);
 var accelerometer_INT1 = Array(graph_num_data_point).fill(0);
 var accelerometer_INT2 = Array(graph_num_data_point).fill(0);
 var acc_idx = 0;
+
+var bat_voltage = 0;
+var bat_rsoc = 0;
 //var laserStart, laserLenght, sensitivity;
 //var chartLenght = 256;
 //var distance = Array(3).fill(0);
@@ -108,6 +112,8 @@ else
       csvContent += "Acc X; Acc Y; Acc Z;"
    if(cbInt.checked)
       csvContent += "INT 1; INT2;"
+   if(cbFuelGauge.checked)
+      csvContent += "Bat_V; BAT_%;"
    csvContent +=  "\r\n";
    startLog.innerText = 'Logging...';
 	flag_logging = 1;
@@ -128,12 +134,15 @@ function handleAccelerometer(accData) {
     var temp1, temp2, temp3, temp4; // float 4 bytes
     var accX, accY, accZ; // float 4 bytes
     var accINT1, accINT2; // uint8 1 byte
+    var bat_v, bat_percentage; // uint16 2 bytes
+    var rssi;    // int8 1 byte
     var i;
+    var start_idx = 5;
     
      var data = Array(packet_size).fill(0);
-     for (i = 0; i < packet_size-2; i++)
+     for (i = 0; i < packet_size; i++)
      {
-     	 data[i] = event.target.value.getUint8(packet_size-3-i);
+     	 data[i] = event.target.value.getUint8(packet_size-1-i);
      }
                   
       var buf = new ArrayBuffer(packet_size);
@@ -141,19 +150,24 @@ function handleAccelerometer(accData) {
       data.forEach(function (b, i) {
           view.setUint8(i, b);
       });
-      cap1 = view.getFloat64(52);
-      cap2 = view.getFloat64(44);
-      cap3 = view.getFloat64(36);
-      cap4 = view.getFloat64(28);
-      temp1 = view.getFloat32(24);
-      temp2 = view.getFloat32(20);
-      temp3 = view.getFloat32(16);
-      temp4 = view.getFloat32(12);
-      accX= view.getFloat32(8);
-      accY= view.getFloat32(4);
-      accZ= view.getFloat32(0);
-      accINT1 = event.target.value.getUint8(60);
-      accINT2 = event.target.value.getUint8(61);
+      cap1 = view.getFloat64(start_idx+54);
+      cap2 = view.getFloat64(start_idx+46);
+      cap3 = view.getFloat64(start_idx+38);
+      cap4 = view.getFloat64(start_idx+30);
+      temp1 = view.getFloat32(start_idx+26);
+      temp2 = view.getFloat32(start_idx+22);
+      temp3 = view.getFloat32(start_idx+18);
+      temp4 = view.getFloat32(start_idx+14);
+      accX= view.getFloat32(start_idx+10);
+      accY= view.getFloat32(start_idx+6);
+      accZ= view.getFloat32(start_idx+2);
+      bat_v = ((data[5]& 0xFF) << 8) + (data[6]& 0xFF);
+      bat_percentage = ((data[3]& 0xFF) << 8) + (data[4]& 0xFF);
+      accINT1 = data[2]
+      accINT2 = data[1];
+      
+      var sign = data[0] & (1 << 7);
+      rssi = (data[0] & 0x7f) * (sign !== 0 ? -1 : 1);
       
       
     if(acc_idx>=graph_num_data_point){
@@ -179,6 +193,8 @@ function handleAccelerometer(accData) {
       accelerometerZ[acc_idx] = accZ*ACCEL_DATA_OFFSET_DATA_HANDLING*ACCEL_DATA_SCALE;
       accelerometer_INT1[acc_idx] = accINT1;
       
+      bat_v = bat_v*0.001;
+      bat_percentage = bat_percentage*0.1;
       //drawAcc(accX, accXCanvas);
       //drawAcc(accY, accYCanvas);
       //drawAcc(accZ, accZCanvas);
@@ -192,7 +208,7 @@ function handleAccelerometer(accData) {
        ':  [ '+cap1.toString()+' | '+ cap2.toString()+' | '+ cap3.toString()+' | '+ cap4.toString()+' || '+
          temp1.toString()+' | '+ temp2.toString()+' | '+ temp3.toString()+' | '+ temp4.toString()+
        ' || '+ accX.toString()+' | '+ accY.toString()+' | '+ accZ.toString()+' || '+
-       accINT1.toString()+' | '+ accINT2.toString()+' ]'+'</li>');
+       accINT1.toString()+' | '+ accINT2.toString()+ ' || '+ bat_v.toString()+' | '+ bat_percentage.toString()+ ' || '+ rssi.toString()+' ]'+'</li>');
        $("#log").scrollTop(pkg_idx*100); 
        $("#log").last().focus();
     	acc_idx++;
@@ -215,7 +231,8 @@ function handleAccelerometer(accData) {
 		      data_array.push(accX.toString(), accY.toString(), accZ.toString());
 		   if(cbInt.checked)
 		      data_array.push(accINT1.toString(), accINT2.toString());
-
+         if(cbFuelGauge.checked)
+            data_array.push(bat_v.toString(), bat_percentage.toString());
          let row = data_array.join(";");
          csvContent += row + "\r\n";
       }
