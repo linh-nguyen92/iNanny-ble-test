@@ -12,7 +12,7 @@
       return navigator.bluetooth.requestDevice({
         filters: [{
           //services : [serviceDataRegister]
-          name:'iNanny'
+          namePrefix:'iNanny'
         }],
         optionalServices: [serviceDataRegister]
       })
