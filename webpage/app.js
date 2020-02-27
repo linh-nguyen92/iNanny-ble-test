@@ -193,8 +193,8 @@ function handleAccelerometer(accData) {
       accelerometerZ[acc_idx] = accZ*ACCEL_DATA_OFFSET_DATA_HANDLING*ACCEL_DATA_SCALE;
       accelerometer_INT1[acc_idx] = accINT1;
       
-      bat_v = bat_v*0.001;
-      bat_percentage = bat_percentage*0.1;
+      bat_v = Number(bat_v*0.001).toFixed(3); 
+      bat_percentage = Number(bat_percentage*0.1).toFixed(1); 
       //drawAcc(accX, accXCanvas);
       //drawAcc(accY, accYCanvas);
       //drawAcc(accZ, accZCanvas);
